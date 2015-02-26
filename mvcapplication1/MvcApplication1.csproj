@@ -211,6 +211,7 @@
     <Compile Include="DataAccessLevel\SQLiteDatabaseWorker.cs" />
     <Compile Include="DataAccessLevel\TenDaysForecastsDataContext.cs" />
     <Compile Include="DataAccessLevel\RegionsCitiesDataContext.cs" />
+    <Compile Include="DataAccessLevel\WebTable.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

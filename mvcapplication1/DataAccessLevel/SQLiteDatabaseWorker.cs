@@ -455,8 +455,121 @@ namespace TheTime.DataAccessLevel
         #endregion
 
 
-       
-    
+
+        public List<WebTable> GetWebTable(int cityID, DateTime start, DateTime end)
+        {
+            List<WebTable> table = new List<WebTable>();
+            SettingsDataContext owmSet = new SettingsDataContext();
+            SettingsDataContext yaSet = new SettingsDataContext();
+
+            // получаем строки настроек с нужным городом
+            string sql = "select * from settings where cityID = '" + cityID.ToString() + "' and sourseID = '1' Limit 1";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            foreach (DbDataRecord record in reader)
+            {
+                owmSet.cityID = int.Parse(record["cityID"].ToString());
+                owmSet.ID = int.Parse(record["ID"].ToString());
+                owmSet.sourceID = 1;   
+            }
+
+            sql = "select * from settings where cityID = '" + cityID.ToString() + "' and sourseID = '2' Limit 1";
+            command = new SQLiteCommand(sql, m_dbConnection);
+            reader = command.ExecuteReader();
+
+            foreach (DbDataRecord record in reader)
+            {
+                yaSet.cityID = int.Parse(record["cityID"].ToString());
+                yaSet.ID = int.Parse(record["ID"].ToString());
+                yaSet.sourceID = 1;
+            }
+
+            // получаем данные
+
+            sql = "select * from ten_days_forecasts where (periodDate > '" + start.Date + "' and periodDate < '" + end.Date + "' ) AND (settingId = '" + owmSet.ID + "' or settingID = '" + yaSet.ID + "') order by periodDate ASC";
+            command = new SQLiteCommand(sql, m_dbConnection);
+            reader = command.ExecuteReader();
+
+            int count = 0;
+
+            List<TenDaysForecastsDataContext> temp = new List<TenDaysForecastsDataContext>();
+
+            foreach (DbDataRecord record in reader)
+            {
+                DateTime date = DateTime.Parse(reader["periodDate"].ToString());
+                count++;
+                int id = int.Parse(reader["ID"].ToString());
+                int settingID = int.Parse(reader["settingID"].ToString());
+                DateTime period = DateTime.Parse(reader["periodDate"].ToString());
+                string timeOfDay = reader["timeOfDay"].ToString();
+                string temperature = reader["temperature"].ToString();
+                string symbol = reader["symbol"].ToString();
+
+                temp.Add(new TenDaysForecastsDataContext { periodDate = period, settingID = settingID, symbol = symbol, temperature = temperature, timeOfDay = timeOfDay });
+            }
+
+
+            // формируем список нужного вида
+            for (int i = 0; i < temp.Count; i++ )
+            {
+                // проверяем, есть ли в table запись с такой же датой                
+                if (table.Exists(x => x.date == temp[i].periodDate))
+                { 
+                    // если есть, то обновляем ее                  
+                    int ind = table.IndexOf(table.First(s => s.date == temp[i].periodDate));
+
+                    if (temp[i].settingID == owmSet.ID)
+                    {
+                        if (temp[i].timeOfDay.ToLower() == "ночь")
+                        {
+                            table[ind].owmSymbolNight = temp[i].symbol;
+                            table[ind].owmTempNight = int.Parse(temp[i].temperature);
+                        }
+                        else
+                        {
+                            table[ind].owmSymbolDay = temp[i].symbol;
+                            table[ind].owmTempDay = int.Parse(temp[i].temperature);
+                        }
+                    }
+                    else
+                    {
+                        if (temp[i].timeOfDay.ToLower() == "ночь")
+                        {
+                            table[ind].yaSymbolNight = temp[i].symbol;
+                            table[ind].yaTempNight = int.Parse(temp[i].temperature);
+                        }
+                        else
+                        {
+                            table[ind].yaSymbolDay = temp[i].symbol;
+                            table[ind].yaTempDay = int.Parse(temp[i].temperature);
+                        }
+                    }
+                }
+                else
+                {
+                    // добавляем новую
+                    if (temp[i].settingID == owmSet.ID)
+                    {
+                        if (temp[i].timeOfDay.ToLower() == "ночь")
+                            table.Add(new WebTable { date = temp[i].periodDate, owmSymbolNight = temp[i].symbol, owmTempNight = int.Parse(temp[i].temperature) });
+                        else
+                            table.Add(new WebTable { date = temp[i].periodDate, owmSymbolDay = temp[i].symbol, owmTempDay = int.Parse(temp[i].temperature) });
+                    }
+                    else
+                    {
+                        if (temp[i].timeOfDay.ToLower() == "ночь")
+                            table.Add(new WebTable { date = temp[i].periodDate, yaSymbolNight = temp[i].symbol, yaTempNight = int.Parse(temp[i].temperature) });
+                        else
+                            table.Add(new WebTable { date = temp[i].periodDate, yaSymbolDay = temp[i].symbol, yaTempDay = int.Parse(temp[i].temperature) });
+                  
+                    }
+
+                }
+
+            }
+                return table;
+        }
 
      
     }

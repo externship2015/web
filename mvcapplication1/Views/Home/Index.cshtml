@@ -84,23 +84,23 @@
             $("#jqg").jqGrid({
                 url: '@Url.Action("GetData")',
                 datatype: "json",
-                colNames: ['Id', 'Название', 'Автор', 'Год', 'Цена'],
+                colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь'],
                 colModel: [
-                { name: 'Id', index: 'Id', width: 30, stype: 'text' },
-                { name: 'name', index: 'name', width: 150, sortable: true },
-                { name: 'Author', index: 'Author', width: 150, sortable: true },
-                { name: 'Year', index: 'Year', width: 100, sortable: false },
-                { name: 'Price', index: 'Price', width: 80, align: "right", sortable: true }
+                { name: 'date', index: 'date', width: 30 },
+                { name: 'yaTempNight', index: 'yaTempNight', width: 150, sortable: true },
+                { name: 'yaTempDay', index: 'yaTempDay', width: 150, sortable: true },
+                { name: 'owmTempDay', index: 'owmTempDay', width: 100, sortable: false },
+                { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true }
                 ],
                 rowNum: 5, // число отображаемых строк
                 rowList: [10, 20, 30],
                 pager: '#jpager',
                 loadonce: true, // загрузка только один раз
-                sortname: 'Id', // сортировка по умолчанию по столбцу Id
+                sortname: 'date', // сортировка по умолчанию по столбцу Id
                 sortorder: "desc", // порядок сортировки
-                caption: "Список Книг"
+                caption: "Статистика"
             });
-        });
+        });       
     </script>
 
        

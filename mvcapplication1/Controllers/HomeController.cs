@@ -15,6 +15,8 @@ namespace JQGridApp.Controllers
         static List<Book> books = new List<Book>();
         static SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
 
+        static List<WebTable> table = new List<WebTable>();
+
 
         //SQLworker.SetConnect(SQLworker.);
         //rsl = SQLworker.GetCitiesList();
@@ -30,6 +32,11 @@ namespace JQGridApp.Controllers
             SQLworker.SetConnect();
             rsl = SQLworker.GetCitiesList();
             SQLworker.CloseConnect();
+
+            // test - получаем данные в нужном виде из базы
+            SQLworker.SetConnect();
+            table = SQLworker.GetWebTable(27786, DateTime.Now.AddDays(-10), DateTime.Now.AddDays(2));
+            SQLworker.CloseConnect();
         }
 
         public ActionResult Index()
@@ -40,7 +47,8 @@ namespace JQGridApp.Controllers
         public string GetData()
         {
             //return JsonConvert.SerializeObject(books);
-            return JsonConvert.SerializeObject(rsl.regionsList);
+            //return JsonConvert.SerializeObject(rsl.regionsList);
+            return JsonConvert.SerializeObject(table);
         }
 
        
