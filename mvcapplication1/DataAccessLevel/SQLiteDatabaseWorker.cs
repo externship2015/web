@@ -458,6 +458,8 @@ namespace TheTime.DataAccessLevel
 
         public List<WebTable> GetWebTable(int cityID, DateTime start, DateTime end)
         {
+            string str_start = start.ToString("YYYY-MM-dd");
+            string str_end = end.ToString("YYYY-MM-dd");
             List<WebTable> table = new List<WebTable>();
             SettingsDataContext owmSet = new SettingsDataContext();
             SettingsDataContext yaSet = new SettingsDataContext();
@@ -486,14 +488,14 @@ namespace TheTime.DataAccessLevel
             }
 
             // получаем данные
-
-            sql = "select * from ten_days_forecasts where (periodDate > '" + start.Date + "' and periodDate < '" + end.Date + "' ) AND (settingId = '" + owmSet.ID + "' or settingID = '" + yaSet.ID + "') order by periodDate ASC";
+            sql = "select * from ten_days_forecasts where (settingId = '1' or settingID = '2') order by periodDate ASC";
+            
             command = new SQLiteCommand(sql, m_dbConnection);
             reader = command.ExecuteReader();
 
             int count = 0;
 
-            List<TenDaysForecastsDataContext> temp = new List<TenDaysForecastsDataContext>();
+            List<TenDaysForecastsDataContext> _temp = new List<TenDaysForecastsDataContext>();
 
             foreach (DbDataRecord record in reader)
             {
@@ -506,8 +508,11 @@ namespace TheTime.DataAccessLevel
                 string temperature = reader["temperature"].ToString();
                 string symbol = reader["symbol"].ToString();
 
-                temp.Add(new TenDaysForecastsDataContext { periodDate = period, settingID = settingID, symbol = symbol, temperature = temperature, timeOfDay = timeOfDay });
+                _temp.Add(new TenDaysForecastsDataContext { periodDate = period, settingID = settingID, symbol = symbol, temperature = temperature, timeOfDay = timeOfDay });
             }
+
+            // из полученного списка выбираем нужный диапазон дат           
+            List<TenDaysForecastsDataContext> temp = (from t in _temp where (t.periodDate > start && t.periodDate < end) select t).ToList();
 
 
             // формируем список нужного вида
