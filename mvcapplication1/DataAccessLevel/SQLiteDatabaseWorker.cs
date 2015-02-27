@@ -30,7 +30,7 @@ namespace TheTime.DataAccessLevel
     
         public void SetConnect()
         {
-            string path = @"D:\Database.db";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Database.db";
             m_dbConnection = new SQLiteConnection(@"Data Source=" + path + ";Version=3;datetimeformat=CurrentCulture");
             m_dbConnection.Open();
         }
@@ -457,9 +457,7 @@ namespace TheTime.DataAccessLevel
 
 
         public List<WebTable> GetWebTable(int cityID, DateTime start, DateTime end)
-        {
-            string str_start = start.ToString("YYYY-MM-dd");
-            string str_end = end.ToString("YYYY-MM-dd");
+        {           
             List<WebTable> table = new List<WebTable>();
             SettingsDataContext owmSet = new SettingsDataContext();
             SettingsDataContext yaSet = new SettingsDataContext();
@@ -488,14 +486,15 @@ namespace TheTime.DataAccessLevel
             }
 
             // получаем данные
-            sql = "select * from ten_days_forecasts where (settingId = '1' or settingID = '2') order by periodDate ASC";
+            sql = "SELECT * FROM ten_days_forecasts where periodDate > date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate < date('" + end.Date.ToString("yyyy-MM-dd") + "')";
+            //sql = "select * from ten_days_forecasts where (settingId = '1' or settingID = '2') order by periodDate ASC";
             
             command = new SQLiteCommand(sql, m_dbConnection);
             reader = command.ExecuteReader();
 
             int count = 0;
 
-            List<TenDaysForecastsDataContext> _temp = new List<TenDaysForecastsDataContext>();
+            List<TenDaysForecastsDataContext> temp = new List<TenDaysForecastsDataContext>();
 
             foreach (DbDataRecord record in reader)
             {
@@ -508,11 +507,11 @@ namespace TheTime.DataAccessLevel
                 string temperature = reader["temperature"].ToString();
                 string symbol = reader["symbol"].ToString();
 
-                _temp.Add(new TenDaysForecastsDataContext { periodDate = period, settingID = settingID, symbol = symbol, temperature = temperature, timeOfDay = timeOfDay });
+                temp.Add(new TenDaysForecastsDataContext { periodDate = period, settingID = settingID, symbol = symbol, temperature = temperature, timeOfDay = timeOfDay });
             }
 
             // из полученного списка выбираем нужный диапазон дат           
-            List<TenDaysForecastsDataContext> temp = (from t in _temp where (t.periodDate > start && t.periodDate < end) select t).ToList();
+           // List<TenDaysForecastsDataContext> temp = (from t in _temp where (t.periodDate > start && t.periodDate < end) select t).ToList();
 
 
             // формируем список нужного вида

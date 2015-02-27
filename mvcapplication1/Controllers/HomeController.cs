@@ -35,7 +35,7 @@ namespace JQGridApp.Controllers
 
             // test - получаем данные в нужном виде из базы
             SQLworker.SetConnect();
-            table = SQLworker.GetWebTable(27786, DateTime.Now.AddDays(-10), DateTime.Now.AddDays(2));
+            table = SQLworker.GetWebTable(27786, DateTime.Now.AddDays(-10), DateTime.Now.AddDays(20));
             SQLworker.CloseConnect();
         }
 
