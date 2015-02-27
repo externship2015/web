@@ -84,14 +84,33 @@
             $("#jqg").jqGrid({
                 url: '@Url.Action("GetData")',
                 datatype: "json",
-                colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь'],
+                colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь', 'Image'],
                 colModel: [
                 { name: 'date', index: 'date', width: 30 },
                 { name: 'yaTempNight', index: 'yaTempNight', width: 150, sortable: true },
                 { name: 'yaTempDay', index: 'yaTempDay', width: 150, sortable: true },
                 { name: 'owmTempDay', index: 'owmTempDay', width: 100, sortable: false },
-                { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true }
+                { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true },
+                { name: 'Picture', width: 50, fixed: true, formatter: function () {
+                  //  return '<img src="Images/' + '" width="50" height="50"/>';
+                  return "<img src='Images/sun.jpg' width='50' height='50'/>";
+                }
+                }
                 ],
+
+
+                // Обработка после добавления данных в строку
+                afterInsertRow: function (row_id, row_data) {
+                    if (Math.abs((row_data.yaTempNight) - parseInt(row_data.owmTempNight)) > 2) {
+                        var icl;
+                        for (icl = 0; icl < 5; icl++)
+                        {
+                            $('#jqg').jqGrid('setCell', row_id, icl, '', { 'color': 'red'});
+                        }
+                        }
+                },
+
+                height: 200,
                 rowNum: 5, // число отображаемых строк
                 rowList: [10, 20, 30],
                 pager: '#jpager',
@@ -100,9 +119,13 @@
                 sortorder: "desc", // порядок сортировки
                 caption: "Статистика"
             });
+            
+
         });       
     </script>
-
+    <script type="text/javascript"> 
+        
+    </script>
        
 </body>
 </html>

@@ -30,7 +30,7 @@ namespace TheTime.DataAccessLevel
     
         public void SetConnect()
         {
-            string path = @"D:\Database.db";
+            string path = @"C:\C#\Application\SimSoft\web\mvcapplication1\Database.db";
             m_dbConnection = new SQLiteConnection(@"Data Source=" + path + ";Version=3;datetimeformat=CurrentCulture");
             m_dbConnection.Open();
         }
