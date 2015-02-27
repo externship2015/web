@@ -528,12 +528,13 @@ namespace TheTime.DataAccessLevel
                     {
                         if (temp[i].timeOfDay.ToLower() == "ночь")
                         {
-                            table[ind].owmSymbolNight = temp[i].symbol;
+                            table[ind].owmSymbolNight = temp[i].symbol.Trim('_');
+
                             table[ind].owmTempNight = int.Parse(temp[i].temperature);
                         }
                         else
                         {
-                            table[ind].owmSymbolDay = temp[i].symbol;
+                            table[ind].owmSymbolDay = temp[i].symbol.Trim('_'); ;
                             table[ind].owmTempDay = int.Parse(temp[i].temperature);
                         }
                     }
@@ -557,9 +558,9 @@ namespace TheTime.DataAccessLevel
                     if (temp[i].settingID == owmSet.ID)
                     {
                         if (temp[i].timeOfDay.ToLower() == "ночь")
-                            table.Add(new WebTable { date = temp[i].periodDate, owmSymbolNight = temp[i].symbol, owmTempNight = int.Parse(temp[i].temperature) });
+                            table.Add(new WebTable { date = temp[i].periodDate, owmSymbolNight = temp[i].symbol.Trim('_'), owmTempNight = int.Parse(temp[i].temperature) });
                         else
-                            table.Add(new WebTable { date = temp[i].periodDate, owmSymbolDay = temp[i].symbol, owmTempDay = int.Parse(temp[i].temperature) });
+                            table.Add(new WebTable { date = temp[i].periodDate, owmSymbolDay = temp[i].symbol.Trim('_'), owmTempDay = int.Parse(temp[i].temperature) });
                     }
                     else
                     {
