@@ -12,10 +12,8 @@ namespace JQGridApp.Controllers
 {
     public class HomeController : Controller
     {
-        static List<Book> books = new List<Book>();
-        static SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
-
-        static List<WebTable> table = new List<WebTable>();
+       
+        
 
 
         //SQLworker.SetConnect(SQLworker.);
@@ -24,19 +22,6 @@ namespace JQGridApp.Controllers
         static RegionCitiesLists rsl = new RegionCitiesLists();
         static HomeController()
         {
-            books.Add(new Book { Id = 1, Name = "Война и мир", Author = "Л. Толстой", Year = 1863, Price = 220 });
-            books.Add(new Book { Id = 2, Name = "Отцы и дети", Author = "И. Тургенев", Year = 1862, Price = 195 });
-            books.Add(new Book { Id = 3, Name = "Чайка", Author = "А. Чехов", Year = 1895, Price = 158 });
-            books.Add(new Book { Id = 4, Name = "Подросток", Author = "Ф. Достоевский", Year = 1875, Price = 210 });
-
-            SQLworker.SetConnect();
-            rsl = SQLworker.GetCitiesList();
-            SQLworker.CloseConnect();
-
-            // test - получаем данные в нужном виде из базы
-            SQLworker.SetConnect();
-            table = SQLworker.GetWebTable(27786, DateTime.Now.AddDays(-10), DateTime.Now.AddDays(20));
-            SQLworker.CloseConnect();
         }
 
         public ActionResult Index()
@@ -44,13 +29,37 @@ namespace JQGridApp.Controllers
             return View();
         }
 
-        public string GetData()
-        {
-            //return JsonConvert.SerializeObject(books);
-            //return JsonConvert.SerializeObject(rsl.regionsList);
+        public string GetData(List<String> values)
+        {             
+            /* приходит массив строк
+             * values[0] - с - дата
+             * values[1] - по - дата
+             * values[2] - ид региона - 81
+             * values[3] - название города - Ульяновск
+             */
+
+            SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
+            List<WebTable> table = new List<WebTable>();
+            SQLworker.SetConnect();
+            table = SQLworker.GetWebTable(values[2], values[3], DateTime.Now.AddDays(-10), DateTime.Now.AddDays(20));
+            SQLworker.CloseConnect();
             return JsonConvert.SerializeObject(table);
+           
         }
 
+        [HttpPost]
+        public string Index(FormModel Model)
+        {
+            // получаем id региона и название города, и две даты
+            SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
+            
+
+
+
+            string fin = "";
+
+            return "123";
+        }
        
         
         public string GetRegions()

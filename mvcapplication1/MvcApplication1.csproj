@@ -219,6 +219,7 @@
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\Book.cs" />
     <Compile Include="Models\Cities.cs" />
+    <Compile Include="Models\FormModel.cs" />
     <Compile Include="Models\Regions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="YandexMethods\YandexMethods.cs" />

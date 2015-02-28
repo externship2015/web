@@ -456,16 +456,30 @@ namespace TheTime.DataAccessLevel
 
 
 
-        public List<WebTable> GetWebTable(int cityID, DateTime start, DateTime end)
+        public List<WebTable> GetWebTable(string regID, string CitName, DateTime start, DateTime end)
         {           
+
+            // получаем id города
+            int cityID = 0;
+
             List<WebTable> table = new List<WebTable>();
             SettingsDataContext owmSet = new SettingsDataContext();
             SettingsDataContext yaSet = new SettingsDataContext();
 
-            // получаем строки настроек с нужным городом
-            string sql = "select * from settings where cityID = '" + cityID.ToString() + "' and sourseID = '1' Limit 1";
+            // достаем id нужного города из базы
+            string sql = "select * from cities where name = '"+CitName+"' and regionID = '"+regID+"'";
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
+            foreach (DbDataRecord record in reader)
+            {
+                cityID = int.Parse(record["yandexID"].ToString());
+                
+            }
+
+            // получаем строки настроек с нужным городом
+            sql = "select * from settings where cityID = '" + cityID.ToString() + "' and sourseID = '1' Limit 1";
+            command = new SQLiteCommand(sql, m_dbConnection);
+            reader = command.ExecuteReader();
 
             foreach (DbDataRecord record in reader)
             {
@@ -486,7 +500,7 @@ namespace TheTime.DataAccessLevel
             }
 
             // получаем данные
-            sql = "SELECT * FROM ten_days_forecasts where periodDate > date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate < date('" + end.Date.ToString("yyyy-MM-dd") + "')";
+            sql = "SELECT * FROM ten_days_forecasts where (periodDate > date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate < date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + yaSet.ID.ToString() + "')";
             //sql = "select * from ten_days_forecasts where (settingId = '1' or settingID = '2') order by periodDate ASC";
             
             command = new SQLiteCommand(sql, m_dbConnection);
