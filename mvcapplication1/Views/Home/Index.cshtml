@@ -14,6 +14,31 @@
     <script src="~/Scripts/jquery-ui-1.8.24.min.js" type="text/javascript"></script>
     <script src="~/Scripts/jquery.jqGrid.min.js" type="text/javascript"></script>
     <script src="~/Scripts/i18n/grid.locale-ru.js" type="text/javascript"></script>
+    <link href="~/Content/themes/base/jquery.ui.core.css")" rel="stylesheet" type="text/css" />
+
+    @*<meta charset="utf-8">   
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
+    <link rel="stylesheet" href="/resources/demos/style.css">*@
+
+
+    @*<link href="~/Content/themes/base/jquery.ui.datepicker.css")" rel="stylesheet" type="text/css" />*@
+   
+     @*<link href="~/Content/bootstrap.css")" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap-responsive.css" )" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap-responsive.min.css" )" rel="stylesheet" type="text/css" />
+    <link href="~/Content/datepicker3.css")" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.css" )" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" )" rel="stylesheet" type="text/css" />
+
+
+
+    <link href="~/Content/themes/base/jquery.ui.theme.css")" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/bootstrap.js")" type="text/javascript"></script>*@
+    <script src="~/Scripts/locales/bootstrap-datepicker.ru.js" )" type="text/javascript"></script>
+    @*<script src="~/Scripts/bootstrap.min.js" )" type="text/javascript"></script>
+    <script src="~/Scripts/bootstrap-datepicker.js")" type="text/javascript"></script>*@
     <style>
         .ui-jqgrid .ui-pg-input {
              height: 20px;
@@ -39,116 +64,169 @@
 
     @using (Html.BeginForm())
     {
-        @Html.TextBox("date1") <!-- Дата с -->
-        @Html.TextBox("date2") <!-- Дата по -->
+        @*@Html.TextBox("date1") <!-- Дата с -->
+        @Html.TextBox("date2") <!-- Дата по -->*@
+
+
+    @*<p>
+        Введите первую дату: @Html.TextBox("exampleDateTime2", null, new { @class = "datePicker" })
+        Введите вторую дату: @Html.TextBox("exampleDateTime3", null, new { @class = "datePicker2" })
+    </p>
+
+    <p>
+        Выберите дату: <input type="date" name="calendar">    
+    </p>*@
+
+
+    <script>
+    $(function () {
+        $("#from").datepicker({
+            defaultDate: "+1w",
+            changeMonth: true,
+            numberOfMonths: 3,
+            onClose: function (selectedDate) {
+                $("#to").datepicker("option", "minDate", selectedDate);
+            }
+        });
+        $("#to").datepicker({
+            defaultDate: "+1w",
+            changeMonth: true,
+            numberOfMonths: 3,
+            onClose: function (selectedDate) {
+                $("#from").datepicker("option", "maxDate", selectedDate);
+            }
+        });
+    });
+    </script>   
+
+        <label for="from">From</label>
+        <input type="text" id="from" name="from">
+        <label for="to">to</label>
+        <input type="text" id="to" name="to">
+
+
         <label for="Regions">Regions</label>
         <select id="Regions" name="Regions"></select>
-    
         <label for="Cities">Cities</label>
         <select id="Cities" name="Cities"></select>
-             
-        <a onclick ="Sub()">Отправить</a> 
-    }
-    
-  
-    <script type="text/javascript">
-        $(function (){
-            $.getJSON("/Home/Regions/List", function (data) {
-                var items = "<option>----------------------</option>";
-                $.each(data, function (i, reg) {
-                    items+="<option value='"+reg.Value +"'>"+reg.Text + "</option>";
-                });
-                $("#Regions").html(items);
-            });
+        <a onclick="Sub()">Отправить</a>
+        }
 
-             $("#Regions").change(function () {
-                $.getJSON("/Home/Cities/List/" + $("#Regions > option:selected").attr("value"), function (data) {
+
+        @*<script type="text/javascript">
+            $(document).ready(function () {
+                $('.datePicker').datepicker({ firstDay: 1, dateFormat: 'dd.mm.yy' });
+                $('.datePicker2').datepicker({ firstDay: 1, dateFormat: 'dd/mm/yy' });
+            });
+            </script>*@
+
+        <script type="text/javascript">
+            $(function () {
+                $.getJSON("/Home/Regions/List", function (data) {
                     var items = "<option>----------------------</option>";
-                    $.each(data, function (i, sta) {
-                        items += "<option value='" + sta.Text + "'>" + sta.Text + "</option>";
+                    $.each(data, function (i, reg) {
+                        items += "<option value='" + reg.Value + "'>" + reg.Text + "</option>";
                     });
-                    $("#Cities").html(items);
+                    $("#Regions").html(items);
+                });
+
+                $("#Regions").change(function () {
+                    $.getJSON("/Home/Cities/List/" + $("#Regions > option:selected").attr("value"), function (data) {
+                        var items = "<option>----------------------</option>";
+                        $.each(data, function (i, sta) {
+                            items += "<option value='" + sta.Text + "'>" + sta.Text + "</option>";
+                        });
+                        $("#Cities").html(items);
+                    });
                 });
             });
-        });
-    </script>
-
-   
-    <table id="jqg"></table>
-    <div id="jpager"></div>
+        </script>
 
 
-   
-     <script type="text/javascript">
+        <table id="jqg"></table>
+        <div id="jpager"></div>
 
-         function Sub()
-         {
-             var stringArray = new Array();
-             stringArray[0] = $("#date1").val();
-             stringArray[1] = $("#date2").val();
-             stringArray[2] = $("#Regions").val();
-             stringArray[3] = $("#Cities").val();
 
-             var postData = { values: stringArray };
 
-             var result;
+        <script type="text/javascript">
 
-             $.ajax({
-                 type: "POST",
-                 url: '@Url.Action("GetData")',
-                 data: postData,
-                 success: function (data) {
-                     alert('ок');
-                     result = data;
-                     console.log(result);
-                     // вызвать jqgrid и отдать ему data
-                     $("#jqg").jqGrid('GridUnload');
-                     $("#jqg").jqGrid({
-                         //url: '@Url.Action("GetData")',
-                         datatype: "jsonstring",
-                         datastr: result,
-                         jsonReader: { repeatitems: false },
-                         colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь', 'Image'],
-                         colModel: [
-                         { name: 'date', index: 'date', width: 30 },
-                         { name: 'yaTempNight', index: 'yaTempNight', width: 150, sortable: true },
-                         { name: 'yaTempDay', index: 'yaTempDay', width: 150, sortable: true },
-                         { name: 'owmTempDay', index: 'owmTempDay', width: 100, sortable: false },
-                         { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true },
-                         {
-                             name: 'Picture', width: 50, fixed: true, formatter: function () {
-                                 return "<img src='Images/sun.jpg' width='50' height='50'/>";
-                             }
-                         }
-                         ],
-                         // Обработка после добавления данных в строку
-                         afterInsertRow: function (row_id, row_data) {
-                             if (Math.abs((row_data.yaTempNight) - parseInt(row_data.owmTempNight)) > 2) {
-                                 var icl;
-                                 for (icl = 0; icl < 5; icl++) {
-                                     $('#jqg').jqGrid('setCell', row_id, icl, '', { 'color': 'red' });
-                                 }
-                             }
-                         },
-                         height: 200,
-                         rowNum: 5, // число отображаемых строк
-                         rowList: [10, 20, 30],
-                         pager: '#jpager',
-                         loadonce: true, // загрузка только один раз
-                         sortname: 'date', // сортировка по умолчанию по столбцу Id
-                         sortorder: "desc", // порядок сортировки
-                         caption: "Статистика"
-                     });
-                 },
-                 dataType: "json",
-                 traditional: true
-             });
+            function Sub() {
+                var stringArray = new Array();
+                stringArray[0] = $("#from").val();
+                stringArray[1] = $("#to").val();
+                stringArray[2] = $("#Regions").val();
+                stringArray[3] = $("#Cities").val();
 
-             console.log(result);
-         }
+                if ((stringArray[0] == "")||(stringArray[1] == ""))
+                {
+                    alert("Не указана дата");
+                    return;
+                }
+                if ((stringArray[3] == "") || (stringArray[3] == null) || (stringArray[3] == "----------------------"))
+                {
+                    alert("Не выбран город");
+                    return;
+                }
+                var postData = { values: stringArray };
 
-    </script>
-    
-       
-</body>
+                var result;
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetData")',
+                    data: postData,
+                    success: function (data) {
+                        alert('ок');
+                        result = data;
+                        console.log(result);
+                        // вызвать jqgrid и отдать ему data
+                        $("#jqg").jqGrid('GridUnload');
+                        $("#jqg").jqGrid({
+                            //url: '@Url.Action("GetData")',
+                            datatype: "jsonstring",
+                            datastr: result,
+                            jsonReader: { repeatitems: false },
+                            colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь', 'Image'],
+                            colModel: [
+                            { name: 'date', index: 'date', width: 30 },
+                            { name: 'yaTempNight', index: 'yaTempNight', width: 150, sortable: true },
+                            { name: 'yaTempDay', index: 'yaTempDay', width: 150, sortable: true },
+                            { name: 'owmTempDay', index: 'owmTempDay', width: 100, sortable: false },
+                            { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true },
+                            {
+                                name: 'Picture', width: 50, fixed: true, formatter: function () {
+                                    return "<img src='Images/sun.jpg' width='50' height='50'/>";
+                                }
+                            }
+                            ],
+                            // Обработка после добавления данных в строку
+                            afterInsertRow: function (row_id, row_data) {
+                                if (Math.abs((row_data.yaTempNight) - parseInt(row_data.owmTempNight)) > 2) {
+                                    var icl;
+                                    for (icl = 0; icl < 5; icl++) {
+                                        $('#jqg').jqGrid('setCell', row_id, icl, '', { 'color': 'red' });
+                                    }
+                                }
+                            },
+                            height: 200,
+                            rowNum: 5, // число отображаемых строк
+                            rowList: [10, 20, 30],
+                            pager: '#jpager',
+                            loadonce: true, // загрузка только один раз
+                            sortname: 'date', // сортировка по умолчанию по столбцу Id
+                            sortorder: "desc", // порядок сортировки
+                            caption: "Статистика"
+                        });
+                    },
+                    dataType: "json",
+                    traditional: true
+                });
+
+                console.log(result);
+            }
+
+        </script>
+
+
+    </body>
 </html>
