@@ -31,6 +31,7 @@ namespace TheTime.DataAccessLevel
         public void SetConnect()
         {
             string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Database.db";
+           // string path = @"D:\DataBase.db";
             m_dbConnection = new SQLiteConnection(@"Data Source=" + path + ";Version=3;datetimeformat=CurrentCulture");
             m_dbConnection.Open();
         }
@@ -592,9 +593,6 @@ namespace TheTime.DataAccessLevel
 
         public List<WebTable> GetWebTable(string regID, string CitName, DateTime start, DateTime end, int onPageCount, int page)
         {
-            // вместо start и end использовать крайние даты, удовлетворяющие запросу
-                        
-
             // получаем id города
             int cityID = 0;
 
@@ -634,10 +632,9 @@ namespace TheTime.DataAccessLevel
                 yaSet.ID = int.Parse(record["ID"].ToString());
                 yaSet.sourceID = 1;
             }
-
-
+            
             // получаем нужные даты
-            sql = "SELECT Distinct(periodDate) FROM ten_days_forecasts where (periodDate > date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate < date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate asc Limit "+((page-1)*onPageCount).ToString()+","+onPageCount.ToString()+";";
+            sql = "SELECT Distinct(periodDate) FROM ten_days_forecasts where (periodDate >= date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate asc Limit "+((page-1)*onPageCount).ToString()+","+onPageCount.ToString()+";";
             command = new SQLiteCommand(sql, m_dbConnection);
             reader = command.ExecuteReader();
             List<DateTime> dates = new List<DateTime>();
@@ -649,7 +646,7 @@ namespace TheTime.DataAccessLevel
             if (dates.Count > 0)
             {
                 // получаем данные - в диапазоне первой и последней из выбранных дат
-                sql = "SELECT * FROM ten_days_forecasts where (periodDate > date('" + dates[0].Date.ToString("yyyy-MM-dd") + "') and periodDate < date('" + dates[dates.Count - 1].Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "')";
+                sql = "SELECT * FROM ten_days_forecasts where (periodDate >= date('" + dates[0].Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + dates[dates.Count - 1].Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "')";
                 //sql = "select * from ten_days_forecasts where (settingId = '1' or settingID = '2') order by periodDate ASC";
 
                 command = new SQLiteCommand(sql, m_dbConnection);
@@ -672,10 +669,6 @@ namespace TheTime.DataAccessLevel
 
                     temp.Add(new TenDaysForecastsDataContext { periodDate = period, settingID = settingID, symbol = symbol, temperature = temperature, timeOfDay = timeOfDay });
                 }
-
-                // из полученного списка выбираем нужный диапазон дат           
-                // List<TenDaysForecastsDataContext> temp = (from t in _temp where (t.periodDate > start && t.periodDate < end) select t).ToList();
-
 
                 // формируем список нужного вида
                 for (int i = 0; i < temp.Count; i++)
@@ -738,6 +731,59 @@ namespace TheTime.DataAccessLevel
                 }
             }
             return table;
+        }
+
+        public int GetTotalCnt(string regID, string CitName, DateTime start, DateTime end)
+        {
+            int cityID = 0;
+            List<WebTable> table = new List<WebTable>();
+            SettingsDataContext owmSet = new SettingsDataContext();
+            SettingsDataContext yaSet = new SettingsDataContext();
+
+            // достаем id нужного города из базы
+            string sql = "select * from cities where name = '" + CitName + "' and regionID = '" + regID + "'";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            foreach (DbDataRecord record in reader)
+            {
+                cityID = int.Parse(record["yandexID"].ToString());
+
+            }
+
+            // получаем строки настроек с нужным городом
+            sql = "select * from settings where cityID = '" + cityID.ToString() + "' and sourseID = '1' Limit 1";
+            command = new SQLiteCommand(sql, m_dbConnection);
+            reader = command.ExecuteReader();
+
+            foreach (DbDataRecord record in reader)
+            {
+                owmSet.cityID = int.Parse(record["cityID"].ToString());
+                owmSet.ID = int.Parse(record["ID"].ToString());
+                owmSet.sourceID = 1;
+            }
+
+            sql = "select * from settings where cityID = '" + cityID.ToString() + "' and sourseID = '2' Limit 1";
+            command = new SQLiteCommand(sql, m_dbConnection);
+            reader = command.ExecuteReader();
+
+            foreach (DbDataRecord record in reader)
+            {
+                yaSet.cityID = int.Parse(record["cityID"].ToString());
+                yaSet.ID = int.Parse(record["ID"].ToString());
+                yaSet.sourceID = 1;
+            }
+
+            // получаем нужные даты
+            sql = "SELECT Distinct(periodDate) FROM ten_days_forecasts where (periodDate >= date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate asc";
+            command = new SQLiteCommand(sql, m_dbConnection);
+            reader = command.ExecuteReader();
+            int cnt = 0;
+            foreach (DbDataRecord record in reader)
+            {
+                cnt++;
+            }
+
+            return cnt;
         }
 
     }

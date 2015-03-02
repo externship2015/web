@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,7 +8,7 @@ using Newtonsoft.Json;
 using MvcApplication1.Models;
 using MvcApplication1.DataAccessLevel;
 using TheTime.DataAccessLevel;
-using MvcApplication1.Helpers;
+//using MvcApplication1.Helpers;
 
 namespace JQGridApp.Controllers
 {
@@ -21,11 +22,21 @@ namespace JQGridApp.Controllers
         public ActionResult Index(int page = 1)
         {
             return View();
-            /*int pageSize = 3; // количество объектов на страницу
-            IEnumerable<Phone> phonesPerPages = phones.Skip((page - 1) * pageSize).Take(pageSize);
-            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = phones.Count };
-            IndexViewModel ivm = new IndexViewModel { PageInfo = pageInfo, Phones = phonesPerPages };
-            return View(ivm);*/
+        }
+
+        public string GetTotalCNT(List<String> values)
+        {
+            string formatsrc = "MM/dd/yyyy";
+            DateTime date1 = DateTime.ParseExact(values[0], formatsrc, CultureInfo.InvariantCulture);
+            DateTime date2 = DateTime.ParseExact(values[1], formatsrc, CultureInfo.InvariantCulture);
+            SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();            
+            SQLworker.SetConnect();
+            int cnt = SQLworker.GetTotalCnt(values[2], values[3], date1, date2);
+            SQLworker.CloseConnect();
+            decimal dd = decimal.Parse(cnt.ToString()) / 10;
+            var cnt2 = Math.Ceiling(dd);
+
+            return cnt2.ToString();
         }
 
         public string GetData(List<String> values) 
@@ -37,10 +48,19 @@ namespace JQGridApp.Controllers
              * values[3] - название города - Ульяновск
              * values[4] - номер страницы
              */
+
+            string formatsrc = "MM/dd/yyyy";
+
+
+            DateTime date1 = DateTime.ParseExact(values[0], formatsrc, CultureInfo.InvariantCulture);
+            DateTime date2 = DateTime.ParseExact(values[1], formatsrc, CultureInfo.InvariantCulture);
+            
+
+
             SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
             List<WebTable> table = new List<WebTable>();
             SQLworker.SetConnect();
-            table = SQLworker.GetWebTable(values[2], values[3], DateTime.Now.AddDays(-10), DateTime.Now.AddDays(20), 10, int.Parse(values[4]));
+            table = SQLworker.GetWebTable(values[2], values[3], date1, date2, 10, int.Parse(values[4]));
             SQLworker.CloseConnect();
 
             int page = 1;
@@ -50,31 +70,12 @@ namespace JQGridApp.Controllers
             return JsonConvert.SerializeObject(table);
         }
 
-        public MvcHtmlString getPageData()
-        {
-            PageInfo pageInfo = new PageInfo { PageNumber = 1, PageSize = 3, TotalItems = 10 };
-
-            // @Html.PageLinks(Model.PageInfo, x => Url.Action("Index",new { page = x}))
-
-            PagingHelpers ph = new PagingHelpers();
-            MvcHtmlString links = ph.PageLinks(pageInfo);
-            return links;
-        }
-
             
         public string GetRegions()
         {
            
             return JsonConvert.SerializeObject(rsl.regionsList);
         }
-
-        //public void UpdateCities(string code)
-        //{
-        //    Cities cities = new Cities(code);
-        //  //  RenderView("SelectCity", cities);
-        //}
-
-
 
         public ActionResult RegionList()
         {
