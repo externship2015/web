@@ -8,17 +8,28 @@
 <html>
 <head>
     <title>jqGrid</title>
+
     <script src="~/Scripts/jquery-1.8.2.min.js" type="text/javascript"></script>
+    <link href="~/Content/Combobox.css" rel="stylesheet" />
+    <script src="~/Scripts/chosen.jquery.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="~/Content/docsupport/style.css">
+    <link rel="stylesheet" href="~/Content/docsupport/prism.css">
+    <link rel="stylesheet" href="~/Content/chosen.css">
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.css" rel="stylesheet" />
     <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
     <link href="~/Content/jquery.jqGrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
     <script src="~/Scripts/jquery-ui-1.8.24.min.js" type="text/javascript"></script>
     <script src="~/Scripts/jquery.jqGrid.min.js" type="text/javascript"></script>
     <script src="~/Scripts/i18n/grid.locale-ru.js" type="text/javascript"></script>
-    <style>
-                         .ui-jqgrid .ui-pg-input {
-                    height: 20px;
-                }
-     
+    <script src="~/Scripts/ComboBox.js"></script>
+    
+    <style type="text/css" media="all" > .ui-jqgrid .ui-pg-input {
+        height: 20px;
+    }
+        .chosen-rtl .chosen-drop {
+            left: -9000px;
+        }
         #Button1 {
             width: 109px;
         }
@@ -35,97 +46,119 @@
 </head>
 <body>
 
-
-
-
-    <input id="date1" type="date" value="date1" /><input id="date2" type="date" value="date2" /><br /><br />
+<input id="date1" type="date" value="date1" /><input id="date2" type="date" value="date2" /><br /><br />
     <br /><br />
-
-
-    <label for="Regions">Regions</label>
-    <select id="Regions" name="Regions"></select>
-    
-    <label for="Cities">Cities</label>
-    <select id="Cities" name="Cities"></select>
-    <br />
-    <br />
-    <input type="submit" value="Submit">
-  
     <script type="text/javascript">
-        $(function (){
-            $.getJSON("/Home/Regions/List", function (data) {
-                var items = "<option>----------------------</option>";
-                $.each(data, function (i, reg) {
-                    items+="<option value='"+reg.Value +"'>"+reg.Text + "</option>";
-                });
-                $("#Regions").html(items);
-            });
+    /*    var config = {
+            '.chosen-select': {},
+            '.chosen-select-deselect': { allow_single_deselect: true },
+            '.chosen-select-no-single': { disable_search_threshold: 10 },
+            '.chosen-select-no-results': { no_results_text: 'Oops, nothing found!' },
+            '.chosen-select-width': { width: "95%" }
+        }
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+       }*/
+    </script>
+            <br />
+            <br />
 
-             $("#Regions").change(function () {
-                $.getJSON("/Home/Cities/List/" + $("#Regions > option:selected").attr("value"), function (data) {
-                    var items = "<option>----------------------</option>";
-                    $.each(data, function (i, sta) {
-                        items += "<option value='" + sta.Value + "'>" + sta.Text + "</option>";
+
+            <label for="Regions">Regions</label>
+            <select id="Regions" name="Regions"></select>
+
+            <label for="Cities">Cities</label>
+            <select id="Cities" name="Cities"></select>
+            <br />
+            <br />
+            <input type="submit" value="Submit">
+
+
+            <script type="text/javascript">
+                $(function () {
+                    $.getJSON("/Home/Regions/List", function (data) {
+                        var items = "<option></option>";
+                        $.each(data, function (i, reg) {
+                            items += "<option value='" + reg.Value + "'>" + reg.Text + "</option>";
+                        });
+                        $("#Regions").html(items);
+                        $("#Regions").chosen();
+
                     });
-                    $("#Cities").html(items);
+
+                    $("#Regions").change(function () {
+                        $.getJSON("/Home/Cities/List/" + $("#Regions > option:selected").attr("value"), function (data) {
+                            var items = "<option></option>";
+                            $.each(data, function (i, sta) {
+                                items += "<option value='" + sta.Value + "'>" + sta.Text + "</option>";
+                            });
+                            $("#Cities").html(items);
+                            $("#Cities").chosen({width: '20%'});
+                        });
+                    });
                 });
-            });
-        });
-    </script>
+            </script>
 
 
 
 
-    <h2>jQGrid</h2>
-    <table id="jqg"></table>
-    <div id="jpager"></div>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("#jqg").jqGrid({
-                url: '@Url.Action("GetData")',
-                datatype: "json",
-                colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь', 'Image'],
-                colModel: [
-                { name: 'date', index: 'date', width: 30 },
-                { name: 'yaTempNight', index: 'yaTempNight', width: 150, sortable: true },
-                { name: 'yaTempDay', index: 'yaTempDay', width: 150, sortable: true },
-                { name: 'owmTempDay', index: 'owmTempDay', width: 100, sortable: false },
-                { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true },
-                { name: 'Picture', width: 50, fixed: true, formatter: function () {
-                  //  return '<img src="Images/' + '" width="50" height="50"/>';
-                  return "<img src='Images/sun.jpg' width='50' height='50'/>";
-                }
-                }
-                ],
+            <div class="alert alert-success" align="center">    <h2>jQGrid</h2> </div>
+            <div class="myjqueryUI">
+                <table id="jqg"></table>
+            </div>
+            <div id="jpager"></div>
+            <script type="text/javascript">
 
-
-                // Обработка после добавления данных в строку
-                afterInsertRow: function (row_id, row_data) {
-                    if (Math.abs((row_data.yaTempNight) - parseInt(row_data.owmTempNight)) > 2) {
-                        var icl;
-                        for (icl = 0; icl < 5; icl++)
+                $(document).ready(function () {
+                    $("#jqg").jqGrid({
+                        url: '@Url.Action("GetData")',
+                        datatype: "json",
+                        colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь', 'Image', 'Picture'],
+                        colModel: [
+                        { name: 'date', index: 'date', width: 30 },
+                        { name: 'yaTempNight', index: 'yaTempNight', width: 150, sortable: true },
+                        { name: 'yaTempDay', index: 'yaTempDay', width: 150, sortable: true },
+                        { name: 'owmTempDay', index: 'owmTempDay', width: 100, sortable: false },
+                        { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true },
+                        { name: 'yaSymbolDay', index: 'yaSymbolDay', width: 80, align: "right" },
                         {
-                            $('#jqg').jqGrid('setCell', row_id, icl, '', { 'color': 'red'});
+                            name: 'Picture', width: 50, fixed: true, formatter: function () {
+                                //    return '<img src="Images/' +yaSymbolDay'" width="50" height="50"/>';
+                                return "<img src='Images/skc_d.jpg' width='50' height='50'/>";
+                            }
                         }
-                        }
-                },
+                        ],
 
-                height: 200,
-                rowNum: 5, // число отображаемых строк
-                rowList: [10, 20, 30],
-                pager: '#jpager',
-                loadonce: true, // загрузка только один раз
-                sortname: 'date', // сортировка по умолчанию по столбцу Id
-                sortorder: "desc", // порядок сортировки
-                caption: "Статистика"
-            });
-            
 
-        });       
-    </script>
-    <script type="text/javascript"> 
-        
-    </script>
-       
+                        // Обработка после добавления данных в строку
+                        afterInsertRow: function (row_id, row_data) {
+                            row_data.yaSymbolDay = "<img src='Images/" + row_data.yaSymbolDay + ".png' width='50' height='50'/>";
+                            if (Math.abs((row_data.yaTempNight) - parseInt(row_data.owmTempNight)) > 2) {
+                                var icl;
+                                for (icl = 0; icl < 5; icl++) {
+                                    $('#jqg').jqGrid('setCell', row_id, icl, '', { 'color': 'red' });
+                                }
+                            }
+                        },
+
+
+                        height: 200,
+                        rowNum: 5, // число отображаемых строк
+                        rowList: [10, 20, 30],
+                        pager: '#jpager',
+                        loadonce: true, // загрузка только один раз
+                        sortname: 'date', // сортировка по умолчанию по столбцу Id
+                        sortorder: "desc", // порядок сортировки
+                        caption: "Статистика"
+                    });
+
+
+                });
+            </script>
+            <script type="text/javascript">
+
+
+            </script>
+
 </body>
 </html>
