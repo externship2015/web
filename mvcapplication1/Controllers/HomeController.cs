@@ -7,61 +7,61 @@ using Newtonsoft.Json;
 using MvcApplication1.Models;
 using MvcApplication1.DataAccessLevel;
 using TheTime.DataAccessLevel;
+using MvcApplication1.Helpers;
 
 namespace JQGridApp.Controllers
 {
     public class HomeController : Controller
-    {
-       
-        
-
-
-        //SQLworker.SetConnect(SQLworker.);
-        //rsl = SQLworker.GetCitiesList();
-        //SQLworker.CloseConnect();
+    {       
         static RegionCitiesLists rsl = new RegionCitiesLists();
         static HomeController()
         {
         }
 
-        public ActionResult Index()
+        public ActionResult Index(int page = 1)
         {
             return View();
+            /*int pageSize = 3; // количество объектов на страницу
+            IEnumerable<Phone> phonesPerPages = phones.Skip((page - 1) * pageSize).Take(pageSize);
+            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = phones.Count };
+            IndexViewModel ivm = new IndexViewModel { PageInfo = pageInfo, Phones = phonesPerPages };
+            return View(ivm);*/
         }
 
-        public string GetData(List<String> values)
-        {             
+        public string GetData(List<String> values) 
+        { 
             /* приходит массив строк
              * values[0] - с - дата
              * values[1] - по - дата
              * values[2] - ид региона - 81
              * values[3] - название города - Ульяновск
+             * values[4] - номер страницы
              */
-
             SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
             List<WebTable> table = new List<WebTable>();
             SQLworker.SetConnect();
-            table = SQLworker.GetWebTable(values[2], values[3], DateTime.Now.AddDays(-10), DateTime.Now.AddDays(20));
+            table = SQLworker.GetWebTable(values[2], values[3], DateTime.Now.AddDays(-10), DateTime.Now.AddDays(20), 10, int.Parse(values[4]));
             SQLworker.CloseConnect();
+
+            int page = 1;
+            int pageSize = 3;
+            IEnumerable<WebTable> phonesPerPages = table.Skip((page - 1) * pageSize).Take(pageSize);
+           // PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = phones.Count };
             return JsonConvert.SerializeObject(table);
-           
         }
 
-        [HttpPost]
-        public string Index(FormModel Model)
+        public MvcHtmlString getPageData()
         {
-            // получаем id региона и название города, и две даты
-            SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
-            
+            PageInfo pageInfo = new PageInfo { PageNumber = 1, PageSize = 3, TotalItems = 10 };
 
+            // @Html.PageLinks(Model.PageInfo, x => Url.Action("Index",new { page = x}))
 
-
-            string fin = "";
-
-            return "123";
+            PagingHelpers ph = new PagingHelpers();
+            MvcHtmlString links = ph.PageLinks(pageInfo);
+            return links;
         }
-       
-        
+
+            
         public string GetRegions()
         {
            

@@ -17,6 +17,21 @@ namespace MvcApplication1.DataAccessLevel
         public string yaSymbolNight { get; set; }
         public string owmSymbolNight { get; set; }
         public string owmSymbolDay { get; set; }
-
     }
+    /*
+    public class PageInfo
+    {
+        public int PageNumber { get; set; } // номер текущей страницы
+        public int PageSize { get; set; } // кол-во объектов на странице
+        public int TotalItems { get; set; } // всего объектов
+        public int TotalPages  // всего страниц
+        {
+            get { return (int)Math.Ceiling((decimal)TotalItems / PageSize); }
+        }
+    }
+    public class IndexViewModel
+    {
+        public List<WebTable> row { get; set; }
+        public PageInfo PageInfo { get; set; }
+    }*/
 }

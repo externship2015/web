@@ -1,10 +1,9 @@
-﻿@{
+﻿
+@using MvcApplication1.Helpers
+
+@{
     Layout = null;
 }
-
-
-
-
 <html>
 <head>
     <title>jqGrid</title>
@@ -52,6 +51,15 @@
     
   
     <script type="text/javascript">
+        
+        $(document).ready(function () {
+            getPager();
+
+            $(".btn.btn-default").click(function () {
+                ShowTablePage($(this).html()); // передаем, какую страницу надо загрузить                
+            })
+        });
+
         $(function (){
             $.getJSON("/Home/Regions/List", function (data) {
                 var items = "<option>----------------------</option>";
@@ -76,19 +84,62 @@
    
     <table id="jqg"></table>
     <div id="jpager"></div>
+    <div id ="pager"></div>
 
-
+   <!-- <div id ="pager">
+        <a id ="first" onClick ="pageTable('first')">&laquo;</a>
+        <a id ="prev" onClick ="pageTable('prev')">&larr;</a>
+        <a id ="cur" >1</a>
+        <s id ="next" onClick ="pageTable('next')">&rarr;</s>
+        <a id ="last" onClick ="pageTable('last')">&raquo;</a>
+    </div>
+       -->
    
      <script type="text/javascript">
 
+         /*function pageTable(dir)
+         {
+             
+             var cur = $("#cur").html();
+             dist = cur-0;
+             if (dir = "prev")
+                 dist = cur - 1;
+             if (dir = "first")
+                 dist = 1;
+             if (dir = "next")
+                 dist = cur + 1;
+             if (dir = "last")
+
+         }
+         */
+
          function Sub()
+         {
+             ShowTablePage(1);
+         }
+
+         // в него отдавать номер страницы
+         function getPager()
+         {
+             $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("getPageData")',                 
+                 success: function (data) { 
+                     $("#pager").html(data);
+                 },
+                 dataType: "html",
+                 traditional: true
+             });
+         }
+
+         function ShowTablePage(page)
          {
              var stringArray = new Array();
              stringArray[0] = $("#date1").val();
              stringArray[1] = $("#date2").val();
              stringArray[2] = $("#Regions").val();
              stringArray[3] = $("#Cities").val();
-
+             stringArray[4] = page;
              var postData = { values: stringArray };
 
              var result;
@@ -98,57 +149,58 @@
                  url: '@Url.Action("GetData")',
                  data: postData,
                  success: function (data) {
-                     alert('ок');
                      result = data;
-                     console.log(result);
-                     // вызвать jqgrid и отдать ему data
-                     $("#jqg").jqGrid('GridUnload');
-                     $("#jqg").jqGrid({
-                         //url: '@Url.Action("GetData")',
-                         datatype: "jsonstring",
-                         datastr: result,
-                         jsonReader: { repeatitems: false },
-                         colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь', 'Image'],
-                         colModel: [
-                         { name: 'date', index: 'date', width: 30 },
-                         { name: 'yaTempNight', index: 'yaTempNight', width: 150, sortable: true },
-                         { name: 'yaTempDay', index: 'yaTempDay', width: 150, sortable: true },
-                         { name: 'owmTempDay', index: 'owmTempDay', width: 100, sortable: false },
-                         { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true },
-                         {
-                             name: 'Picture', width: 50, fixed: true, formatter: function () {
-                                 return "<img src='Images/sun.jpg' width='50' height='50'/>";
-                             }
-                         }
-                         ],
-                         // Обработка после добавления данных в строку
-                         afterInsertRow: function (row_id, row_data) {
-                             if (Math.abs((row_data.yaTempNight) - parseInt(row_data.owmTempNight)) > 2) {
-                                 var icl;
-                                 for (icl = 0; icl < 5; icl++) {
-                                     $('#jqg').jqGrid('setCell', row_id, icl, '', { 'color': 'red' });
-                                 }
-                             }
-                         },
-                         height: 200,
-                         rowNum: 5, // число отображаемых строк
-                         rowList: [10, 20, 30],
-                         pager: '#jpager',
-                         loadonce: true, // загрузка только один раз
-                         sortname: 'date', // сортировка по умолчанию по столбцу Id
-                         sortorder: "desc", // порядок сортировки
-                         caption: "Статистика"
-                     });
+                     UpdateTable(result);
                  },
                  dataType: "json",
                  traditional: true
              });
+         }
 
-             console.log(result);
+
+         function UpdateTable(result)
+         {
+             $("#jqg").jqGrid('GridUnload');
+             $("#jqg").jqGrid({
+                 datatype: "jsonstring",
+                 datastr: result,
+                 jsonReader: { repeatitems: false },
+                 colNames: ['Дата', 'ЯндексНочь', 'ЯндексДень', 'OWMДень', 'OWMНочь', 'Image'],
+                 colModel: [
+                 { name: 'date', index: 'date', width: 30 },
+                 { name: 'yaTempNight', index: 'yaTempNight', width: 150, sortable: true },
+                 { name: 'yaTempDay', index: 'yaTempDay', width: 150, sortable: true },
+                 { name: 'owmTempDay', index: 'owmTempDay', width: 100, sortable: false },
+                 { name: 'owmTempNight', index: 'owmTempNight', width: 80, align: "right", sortable: true },
+                 {
+                     name: 'Picture', width: 50, fixed: true, formatter: function () {
+                         return "<img src='Images/sun.jpg' width='50' height='50'/>";
+                     }
+                 }
+                 ],
+                 // Обработка после добавления данных в строку
+                 afterInsertRow: function (row_id, row_data) {
+                     if (Math.abs((row_data.yaTempNight) - parseInt(row_data.owmTempNight)) > 2) {
+                         var icl;
+                         for (icl = 0; icl < 5; icl++) {
+                             $('#jqg').jqGrid('setCell', row_id, icl, '', { 'color': 'red' });
+                         }
+                     }
+                 },
+                 height: 200,
+                 rowNum: 10, // число отображаемых строк
+                 rowList: [10, 20, 30],
+                 pager: '#jpager',
+                 loadonce: false, // загрузка только один раз
+                 sortname: 'date', // сортировка по умолчанию по столбцу Id
+                 sortorder: "desc", // порядок сортировки
+                 caption: "Статистика"
+             });
          }
 
     </script>
-    
+    <br />
+  
        
 </body>
 </html>
