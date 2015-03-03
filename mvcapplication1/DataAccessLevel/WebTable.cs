@@ -17,6 +17,20 @@ namespace MvcApplication1.DataAccessLevel
         public string yaSymbolNight { get; set; }
         public string owmSymbolNight { get; set; }
         public string owmSymbolDay { get; set; }
+        
+        public string owmWindSpeedDay { get; set; }
+        public string owmWindSpeedNight { get; set; }  
+        public string owmPressureDay { get; set; }
+        public string owmPressureNight { get; set; }
+        public string owmHummidityDay { get; set; }
+        public string owmHummidityNight { get; set; }
+
+        public string yaWindSpeedDay { get; set; }
+        public string yaWindSpeedNight { get; set; }
+        public string yaPressureDay { get; set; }
+        public string yaPressureNight { get; set; }
+        public string yaHummidityDay { get; set; }
+        public string yaHummidityNight { get; set; }
     }
     /*
     public class PageInfo

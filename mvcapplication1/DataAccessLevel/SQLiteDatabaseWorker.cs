@@ -639,7 +639,7 @@ namespace TheTime.DataAccessLevel
             }
             
             // получаем нужные даты
-            sql = "SELECT Distinct(periodDate) FROM ten_days_forecasts where (periodDate >= date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate "+sort+" Limit "+((page-1)*onPageCount).ToString()+","+onPageCount.ToString()+";";
+            sql = "SELECT Distinct(periodDate) FROM daily_forecasts where (periodDate >= date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate "+sort+" Limit "+((page-1)*onPageCount).ToString()+","+onPageCount.ToString()+";";
             command = new SQLiteCommand(sql, m_dbConnection);
             reader = command.ExecuteReader();
             List<DateTime> dates = new List<DateTime>();
@@ -663,7 +663,7 @@ namespace TheTime.DataAccessLevel
                 }
 
                 // получаем данные - в диапазоне первой и последней из выбранных дат
-                sql = "SELECT * FROM ten_days_forecasts where (periodDate >= date('" + start1.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end1.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate " + sort;
+                sql = "SELECT * FROM daily_forecasts where (periodDate >= date('" + start1.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end1.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate " + sort;
                 //sql = "select * from ten_days_forecasts where (settingId = '1' or settingID = '2') order by periodDate ASC";
 
                 command = new SQLiteCommand(sql, m_dbConnection);
@@ -671,7 +671,7 @@ namespace TheTime.DataAccessLevel
 
                 int count = 0;
 
-                List<TenDaysForecastsDataContext> temp = new List<TenDaysForecastsDataContext>();
+                List<DailyForecastsDataContext> temp = new List<DailyForecastsDataContext>();
 
                 foreach (DbDataRecord record in reader)
                 {
@@ -683,8 +683,11 @@ namespace TheTime.DataAccessLevel
                     string timeOfDay = reader["timeOfDay"].ToString();
                     string temperature = reader["temperature"].ToString();
                     string symbol = reader["symbol"].ToString();
+                    string windSpeed = reader["windSpeed"].ToString();
+                    string pressure = reader["pressure"].ToString();
+                    string hummidity = reader["hummidity"].ToString();
 
-                    temp.Add(new TenDaysForecastsDataContext { periodDate = period, settingID = settingID, symbol = symbol, temperature = temperature, timeOfDay = timeOfDay });
+                    temp.Add(new DailyForecastsDataContext { periodDate = period, settingID = settingID, symbol = symbol, temperature = temperature, timeOfDay = timeOfDay, hummidity = hummidity, pressure = pressure, windSpeed = windSpeed });
                 }
 
                 // формируем список нужного вида
@@ -703,11 +706,19 @@ namespace TheTime.DataAccessLevel
                                 table[ind].owmSymbolNight = temp[i].symbol.Trim('_');
 
                                 table[ind].owmTempNight = int.Parse(temp[i].temperature);
+                                table[ind].owmHummidityNight = temp[i].hummidity;
+                                table[ind].owmPressureNight = temp[i].pressure;
+                                table[ind].owmWindSpeedNight = temp[i].windSpeed;
+
                             }
-                            else
+                            if (temp[i].timeOfDay.ToLower() == "день")
                             {
                                 table[ind].owmSymbolDay = temp[i].symbol.Trim('_'); ;
                                 table[ind].owmTempDay = int.Parse(temp[i].temperature);
+
+                                table[ind].owmHummidityDay = temp[i].hummidity;
+                                table[ind].owmPressureDay = temp[i].pressure;
+                                table[ind].owmWindSpeedDay = temp[i].windSpeed;
                             }
                         }
                         else
@@ -716,11 +727,19 @@ namespace TheTime.DataAccessLevel
                             {
                                 table[ind].yaSymbolNight = temp[i].symbol;
                                 table[ind].yaTempNight = int.Parse(temp[i].temperature);
+
+                                table[ind].yaHummidityNight = temp[i].hummidity;
+                                table[ind].yaPressureNight = temp[i].pressure;
+                                table[ind].yaWindSpeedNight = temp[i].windSpeed;
                             }
-                            else
+                            if (temp[i].timeOfDay.ToLower() == "день")
                             {
                                 table[ind].yaSymbolDay = temp[i].symbol;
                                 table[ind].yaTempDay = int.Parse(temp[i].temperature);
+
+                                table[ind].yaHummidityDay = temp[i].hummidity;
+                                table[ind].yaPressureDay = temp[i].pressure;
+                                table[ind].yaWindSpeedDay = temp[i].windSpeed;
                             }
                         }
                     }
@@ -730,16 +749,16 @@ namespace TheTime.DataAccessLevel
                         if (temp[i].settingID == owmSet.ID)
                         {
                             if (temp[i].timeOfDay.ToLower() == "ночь")
-                                table.Add(new WebTable { date = temp[i].periodDate, owmSymbolNight = temp[i].symbol.Trim('_'), owmTempNight = int.Parse(temp[i].temperature) });
-                            else
-                                table.Add(new WebTable { date = temp[i].periodDate, owmSymbolDay = temp[i].symbol.Trim('_'), owmTempDay = int.Parse(temp[i].temperature) });
+                                table.Add(new WebTable { date = temp[i].periodDate, owmSymbolNight = temp[i].symbol.Trim('_'), owmTempNight = int.Parse(temp[i].temperature), owmHummidityNight = temp[i].hummidity, owmPressureNight = temp[i].pressure, owmWindSpeedNight = temp[i].windSpeed });
+                            if (temp[i].timeOfDay.ToLower() == "день")
+                                table.Add(new WebTable { date = temp[i].periodDate, owmSymbolDay = temp[i].symbol.Trim('_'), owmTempDay = int.Parse(temp[i].temperature), owmHummidityDay = temp[i].hummidity, owmPressureDay = temp[i].pressure, owmWindSpeedDay = temp[i].windSpeed });
                         }
                         else
                         {
                             if (temp[i].timeOfDay.ToLower() == "ночь")
-                                table.Add(new WebTable { date = temp[i].periodDate, yaSymbolNight = temp[i].symbol, yaTempNight = int.Parse(temp[i].temperature) });
-                            else
-                                table.Add(new WebTable { date = temp[i].periodDate, yaSymbolDay = temp[i].symbol, yaTempDay = int.Parse(temp[i].temperature) });
+                                table.Add(new WebTable { date = temp[i].periodDate, yaSymbolNight = temp[i].symbol, yaTempNight = int.Parse(temp[i].temperature), yaHummidityNight = temp[i].hummidity, yaPressureNight = temp[i].pressure, yaWindSpeedNight = temp[i].windSpeed });
+                            if (temp[i].timeOfDay.ToLower() == "день")
+                                table.Add(new WebTable { date = temp[i].periodDate, yaSymbolDay = temp[i].symbol, yaTempDay = int.Parse(temp[i].temperature), yaHummidityDay = temp[i].hummidity, yaPressureDay = temp[i].pressure, yaWindSpeedDay = temp[i].windSpeed });
 
                         }
 
@@ -791,7 +810,7 @@ namespace TheTime.DataAccessLevel
             }
 
             // получаем нужные даты
-            sql = "SELECT Distinct(periodDate) FROM ten_days_forecasts where (periodDate >= date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate asc";
+            sql = "SELECT Distinct(periodDate) FROM daily_forecasts where (periodDate >= date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate asc";
             command = new SQLiteCommand(sql, m_dbConnection);
             reader = command.ExecuteReader();
             int cnt = 0;
