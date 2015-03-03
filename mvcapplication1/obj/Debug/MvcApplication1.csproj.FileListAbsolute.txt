@@ -214,7 +214,6 @@ D:\Diplom\Web\MvcApplication1\bin\ko\System.Spatial.resources.dll
 D:\Diplom\Web\MvcApplication1\bin\ru\System.Spatial.resources.dll
 D:\Diplom\Web\MvcApplication1\bin\zh-Hans\System.Spatial.resources.dll
 D:\Diplom\Web\MvcApplication1\bin\zh-Hant\System.Spatial.resources.dll
-D:\Diplom\Web\MvcApplication1\obj\Debug\MvcApplication1.csprojResolveAssemblyReference.cache
 D:\Diplom\Web\MvcApplication1\obj\Debug\MvcApplication1.dll
 D:\Diplom\Web\MvcApplication1\obj\Debug\MvcApplication1.pdb
 C:\C#\Application\SimSoft\web\MvcApplication1\bin\MvcApplication1.dll.config
