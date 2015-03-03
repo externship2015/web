@@ -30,8 +30,13 @@ namespace TheTime.DataAccessLevel
     
         public void SetConnect()
         {
+
             string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Database.db";
            // string path = @"D:\DataBase.db";
+
+           // string path = @"C:\C#\Application\SimSoft\web\mvcapplication1\Database.db";
+         //   string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Database.db";
+
             m_dbConnection = new SQLiteConnection(@"Data Source=" + path + ";Version=3;datetimeformat=CurrentCulture");
             m_dbConnection.Open();
         }
@@ -591,7 +596,7 @@ namespace TheTime.DataAccessLevel
                 return table;
         }
 
-        public List<WebTable> GetWebTable(string regID, string CitName, DateTime start, DateTime end, int onPageCount, int page)
+        public List<WebTable> GetWebTable(string regID, string CitName, DateTime start, DateTime end, int onPageCount, int page, string sort = "DESC")
         {
             // получаем id города
             int cityID = 0;
@@ -634,7 +639,7 @@ namespace TheTime.DataAccessLevel
             }
             
             // получаем нужные даты
-            sql = "SELECT Distinct(periodDate) FROM ten_days_forecasts where (periodDate >= date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate asc Limit "+((page-1)*onPageCount).ToString()+","+onPageCount.ToString()+";";
+            sql = "SELECT Distinct(periodDate) FROM ten_days_forecasts where (periodDate >= date('" + start.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate "+sort+" Limit "+((page-1)*onPageCount).ToString()+","+onPageCount.ToString()+";";
             command = new SQLiteCommand(sql, m_dbConnection);
             reader = command.ExecuteReader();
             List<DateTime> dates = new List<DateTime>();
@@ -645,8 +650,20 @@ namespace TheTime.DataAccessLevel
 
             if (dates.Count > 0)
             {
+                // определяем start и end
+
+                DateTime start1 = dates[0];
+                DateTime end1 = dates[dates.Count - 1];
+                if (start1 > end1)
+                { 
+                    // меняем их местами
+                    DateTime t = start1;
+                    start1 = end1;
+                    end1 = t;
+                }
+
                 // получаем данные - в диапазоне первой и последней из выбранных дат
-                sql = "SELECT * FROM ten_days_forecasts where (periodDate >= date('" + dates[0].Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + dates[dates.Count - 1].Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "')";
+                sql = "SELECT * FROM ten_days_forecasts where (periodDate >= date('" + start1.Date.ToString("yyyy-MM-dd") + "') and periodDate <= date('" + end1.Date.ToString("yyyy-MM-dd") + "')) and (settingID ='" + yaSet.ID.ToString() + "' or settingID = '" + owmSet.ID.ToString() + "') order by periodDate " + sort;
                 //sql = "select * from ten_days_forecasts where (settingId = '1' or settingID = '2') order by periodDate ASC";
 
                 command = new SQLiteCommand(sql, m_dbConnection);

@@ -24,6 +24,12 @@ namespace JQGridApp.Controllers
             return View();
         }
 
+        //public string GetData(PagingRequest request)
+        //{
+        //    int a = 0;
+        //    return "1323";
+        //}
+
         public string GetTotalCNT(List<String> values)
         {
             string formatsrc = "MM/dd/yyyy";
@@ -33,20 +39,22 @@ namespace JQGridApp.Controllers
             SQLworker.SetConnect();
             int cnt = SQLworker.GetTotalCnt(values[2], values[3], date1, date2);
             SQLworker.CloseConnect();
-            decimal dd = decimal.Parse(cnt.ToString()) / 10;
+            decimal dd = decimal.Parse(cnt.ToString()) / decimal.Parse(values[5].ToString());
             var cnt2 = Math.Ceiling(dd);
 
             return cnt2.ToString();
         }
 
-        public string GetData(List<String> values) 
-        { 
+        public string GetData(List<String> values)
+        {
             /* приходит массив строк
              * values[0] - с - дата
              * values[1] - по - дата
              * values[2] - ид региона - 81
              * values[3] - название города - Ульяновск
              * values[4] - номер страницы
+             * values[5] - количество элементов на странице
+             * values[6] - порядок сортировки
              */
 
             string formatsrc = "MM/dd/yyyy";
@@ -54,19 +62,19 @@ namespace JQGridApp.Controllers
 
             DateTime date1 = DateTime.ParseExact(values[0], formatsrc, CultureInfo.InvariantCulture);
             DateTime date2 = DateTime.ParseExact(values[1], formatsrc, CultureInfo.InvariantCulture);
-            
+
 
 
             SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
             List<WebTable> table = new List<WebTable>();
             SQLworker.SetConnect();
-            table = SQLworker.GetWebTable(values[2], values[3], date1, date2, 10, int.Parse(values[4]));
+            table = SQLworker.GetWebTable(values[2], values[3], date1, date2, int.Parse(values[5]), int.Parse(values[4]), values[6]);
             SQLworker.CloseConnect();
 
             int page = 1;
             int pageSize = 3;
             IEnumerable<WebTable> phonesPerPages = table.Skip((page - 1) * pageSize).Take(pageSize);
-           // PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = phones.Count };
+            // PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = phones.Count };
             return JsonConvert.SerializeObject(table);
         }
 
