@@ -39,7 +39,7 @@ namespace JQGridApp.Controllers
             SQLworker.SetConnect();
             int cnt = SQLworker.GetTotalCnt(values[2], values[3], date1, date2);
             SQLworker.CloseConnect();
-            decimal dd = decimal.Parse(cnt.ToString()) / decimal.Parse(values[5].ToString());
+            decimal dd = decimal.Parse(cnt.ToString()) / decimal.Parse( values[5].ToString());
             var cnt2 = Math.Ceiling(dd);
 
             return cnt2.ToString();

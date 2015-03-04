@@ -666,3 +666,6 @@ D:\Diplom\merge\MvcApplication1\bin\zh-Hant\System.Spatial.resources.dll
 D:\Diplom\merge\MvcApplication1\obj\Debug\MvcApplication1.csprojResolveAssemblyReference.cache
 D:\Diplom\merge\MvcApplication1\obj\Debug\MvcApplication1.dll
 D:\Diplom\merge\MvcApplication1\obj\Debug\MvcApplication1.pdb
+C:\C#\Application\SimSoft\web\MvcApplication1\bin\Silverlight5PersianDatePicker.dll
+C:\C#\Application\SimSoft\web\MvcApplication1\bin\Silverlight5PersianDatePicker.pdb
+C:\C#\Application\SimSoft\web\MvcApplication1\bin\Silverlight5PersianDatePicker.xml
