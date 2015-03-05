@@ -34,7 +34,7 @@ namespace TheTime.DataAccessLevel
             string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Database.db";
            // string path = @"D:\DataBase.db";
 
-           // string path = @"C:\C#\Application\SimSoft\web\mvcapplication1\Database.db";
+         //   string path = @"C:\C#\Application\SimSoft\web\mvcapplication1\Database.db";
          //   string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Database.db";
 
             m_dbConnection = new SQLiteConnection(@"Data Source=" + path + ";Version=3;datetimeformat=CurrentCulture");

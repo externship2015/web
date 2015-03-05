@@ -107,7 +107,7 @@
         <br />
         <div class="row">
             <div class="col-md-4 col-sm-6 " align="right">
-                <label for="Cities">Город</label>
+                <label id="cit" for="Cities">Город</label>
                 <select id="Cities" name="Cities"></select>
             </div>
             <div class="col-md-3 col-sm-6" align="right">
@@ -124,6 +124,14 @@
                 </div>
             </div>
         </div>
+    <div class="container">
+        <div class="alert alert-danger" id="city_error">
+            <strong>Ошибка!</strong> Укажите город! .
+        </div>
+        </div>
+    <script>
+        $('#city_error').hide();
+    </script>
     <br />
     <br />
 
@@ -300,10 +308,17 @@
             return;
         }*/
         if (($("#Cities").val() == "") || ($("#Cities").val() == null) || ($("#Cities").val() == "----------------------")) {
-            alert("Не выбран город");
+            $("#cit").css("color", "red");
+            $("#city_error").show();
+            $("#pager_content").css("display", "none");
+            $("#gbox_jqg").css("display", "none");
             return;
         }
-        ShowTablePage(1, "desc");
+        else {
+            $("#cit").css("color", "black");
+            $("#city_error").hide();
+            }
+            ShowTablePage(1, "desc");
     }
 
     function ShowTablePage(page, sort) {
@@ -384,6 +399,9 @@
             sortable: false,
             caption: "Статистика"
         });
+
+        $("#gbox_jqg").css("display", "");
+        $("#pager_content").css("display", "");
 
         $("#pager_content").css("display", "");
         $("#pager_content").css("width", $("#gview_jqg").width());
