@@ -32,14 +32,23 @@ namespace JQGridApp.Controllers
 
         public string GetTotalCNT(List<String> values)
         {
-            string formatsrc = "MM/dd/yyyy";
-            DateTime date1 = DateTime.ParseExact(values[0], formatsrc, CultureInfo.InvariantCulture);
-            DateTime date2 = DateTime.ParseExact(values[1], formatsrc, CultureInfo.InvariantCulture);
-            SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();            
+            string formatsrc = "dd-MM-yyyy";
+            DateTime date1 = DateTime.MinValue;
+            DateTime date2 = DateTime.MaxValue;
+            try
+            {
+                date1 = DateTime.ParseExact(values[0], formatsrc, CultureInfo.InvariantCulture);
+                date2 = DateTime.ParseExact(values[1], formatsrc, CultureInfo.InvariantCulture);
+            }
+            catch
+            { }
+
+
+            SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
             SQLworker.SetConnect();
             int cnt = SQLworker.GetTotalCnt(values[2], values[3], date1, date2);
             SQLworker.CloseConnect();
-            decimal dd = decimal.Parse(cnt.ToString()) / decimal.Parse( values[5].ToString());
+            decimal dd = decimal.Parse(cnt.ToString()) / decimal.Parse(values[5].ToString());
             var cnt2 = Math.Ceiling(dd);
 
             return cnt2.ToString();
@@ -57,13 +66,17 @@ namespace JQGridApp.Controllers
              * values[6] - порядок сортировки
              */
 
-            string formatsrc = "MM/dd/yyyy";
 
-
-            DateTime date1 = DateTime.ParseExact(values[0], formatsrc, CultureInfo.InvariantCulture);
-            DateTime date2 = DateTime.ParseExact(values[1], formatsrc, CultureInfo.InvariantCulture);
-
-
+            string formatsrc = "dd-MM-yyyy";
+            DateTime date1 = DateTime.MinValue;
+            DateTime date2 = DateTime.MaxValue;
+            try
+            {
+                date1 = DateTime.ParseExact(values[0], formatsrc, CultureInfo.InvariantCulture);
+                date2 = DateTime.ParseExact(values[1], formatsrc, CultureInfo.InvariantCulture);
+            }
+            catch
+            { }
 
             SQLiteDatabaseWorker SQLworker = new SQLiteDatabaseWorker();
             List<WebTable> table = new List<WebTable>();
@@ -81,8 +94,8 @@ namespace JQGridApp.Controllers
             
         public string GetRegions()
         {
-           
-            return JsonConvert.SerializeObject(rsl.regionsList);
+
+            return JsonConvert.SerializeObject(rsl.regionsList.OrderBy(x => x.name));
         }
 
         public ActionResult RegionList()
@@ -100,14 +113,14 @@ namespace JQGridApp.Controllers
 
         public ActionResult CityList(string regionID)
         {
-            int s=0;
+            int s = 0;
             try
             {
                 s = Convert.ToInt32(regionID);
             }
             catch { }
-            IQueryable cities = stCities.GetCities().Where(x => x.regionID == s);
 
+            IQueryable cities = stCities.GetCities().Where(x => x.regionID == s).OrderBy(x => x.name);
 
             if (HttpContext.Request.IsAjaxRequest())
             {

@@ -8,11 +8,11 @@ namespace MvcApplication1.DataAccessLevel
 {
     class WebTable
     {
-        public DateTime date { get; set; }
-        public int yaTempDay { get; set; }
-        public int yaTempNight { get; set; }
-        public int owmTempDay { get; set; }
-        public int owmTempNight { get; set; }
+        public string date { get; set; }
+        public Nullable<int> yaTempDay { get; set; }
+        public Nullable<int> yaTempNight { get; set; }
+        public Nullable<int> owmTempDay { get; set; }
+        public Nullable<int> owmTempNight { get; set; }
         public string yaSymbolDay { get; set; }
         public string yaSymbolNight { get; set; }
         public string owmSymbolNight { get; set; }

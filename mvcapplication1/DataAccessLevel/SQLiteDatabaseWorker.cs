@@ -424,7 +424,7 @@ namespace TheTime.DataAccessLevel
                 });
             }
 
-            sql = "SELECT * FROM 'regions';";
+            sql = "SELECT * FROM 'regions' order by name asc;";
             command = new SQLiteCommand(sql, m_dbConnection);
             reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
@@ -538,10 +538,10 @@ namespace TheTime.DataAccessLevel
             for (int i = 0; i < temp.Count; i++ )
             {
                 // проверяем, есть ли в table запись с такой же датой                
-                if (table.Exists(x => x.date == temp[i].periodDate))
+                if (table.Exists(x => x.date == temp[i].periodDate.Date.ToString()))
                 { 
                     // если есть, то обновляем ее                  
-                    int ind = table.IndexOf(table.First(s => s.date == temp[i].periodDate));
+                    int ind = table.IndexOf(table.First(s => s.date == temp[i].periodDate.Date.ToString()));
 
                     if (temp[i].settingID == owmSet.ID)
                     {
@@ -577,16 +577,16 @@ namespace TheTime.DataAccessLevel
                     if (temp[i].settingID == owmSet.ID)
                     {
                         if (temp[i].timeOfDay.ToLower() == "ночь")
-                            table.Add(new WebTable { date = temp[i].periodDate, owmSymbolNight = temp[i].symbol.Trim('_'), owmTempNight = int.Parse(temp[i].temperature) });
+                            table.Add(new WebTable { date = temp[i].periodDate.Date.ToString(), owmSymbolNight = temp[i].symbol.Trim('_'), owmTempNight = int.Parse(temp[i].temperature) });
                         else
-                            table.Add(new WebTable { date = temp[i].periodDate, owmSymbolDay = temp[i].symbol.Trim('_'), owmTempDay = int.Parse(temp[i].temperature) });
+                            table.Add(new WebTable { date = temp[i].periodDate.Date.ToString(), owmSymbolDay = temp[i].symbol.Trim('_'), owmTempDay = int.Parse(temp[i].temperature) });
                     }
                     else
                     {
                         if (temp[i].timeOfDay.ToLower() == "ночь")
-                            table.Add(new WebTable { date = temp[i].periodDate, yaSymbolNight = temp[i].symbol, yaTempNight = int.Parse(temp[i].temperature) });
+                            table.Add(new WebTable { date = temp[i].periodDate.Date.ToString(), yaSymbolNight = temp[i].symbol, yaTempNight = int.Parse(temp[i].temperature) });
                         else
-                            table.Add(new WebTable { date = temp[i].periodDate, yaSymbolDay = temp[i].symbol, yaTempDay = int.Parse(temp[i].temperature) });
+                            table.Add(new WebTable { date = temp[i].periodDate.Date.ToString(), yaSymbolDay = temp[i].symbol, yaTempDay = int.Parse(temp[i].temperature) });
                   
                     }
 
@@ -694,10 +694,10 @@ namespace TheTime.DataAccessLevel
                 for (int i = 0; i < temp.Count; i++)
                 {
                     // проверяем, есть ли в table запись с такой же датой                
-                    if (table.Exists(x => x.date == temp[i].periodDate))
+                    if (table.Exists(x => x.date == temp[i].periodDate.Date.ToString("dd.MM.yyyy")))
                     {
                         // если есть, то обновляем ее                  
-                        int ind = table.IndexOf(table.First(s => s.date == temp[i].periodDate));
+                        int ind = table.IndexOf(table.First(s => s.date == temp[i].periodDate.Date.ToString("dd.MM.yyyy")));
 
                         if (temp[i].settingID == owmSet.ID)
                         {
@@ -749,16 +749,16 @@ namespace TheTime.DataAccessLevel
                         if (temp[i].settingID == owmSet.ID)
                         {
                             if (temp[i].timeOfDay.ToLower() == "ночь")
-                                table.Add(new WebTable { date = temp[i].periodDate, owmSymbolNight = temp[i].symbol.Trim('_'), owmTempNight = int.Parse(temp[i].temperature), owmHummidityNight = temp[i].hummidity, owmPressureNight = temp[i].pressure, owmWindSpeedNight = temp[i].windSpeed });
+                                table.Add(new WebTable { date = temp[i].periodDate.Date.ToString("dd.MM.yyyy"), owmSymbolNight = temp[i].symbol.Trim('_'), owmTempNight = int.Parse(temp[i].temperature), owmHummidityNight = temp[i].hummidity, owmPressureNight = temp[i].pressure, owmWindSpeedNight = temp[i].windSpeed });
                             if (temp[i].timeOfDay.ToLower() == "день")
-                                table.Add(new WebTable { date = temp[i].periodDate, owmSymbolDay = temp[i].symbol.Trim('_'), owmTempDay = int.Parse(temp[i].temperature), owmHummidityDay = temp[i].hummidity, owmPressureDay = temp[i].pressure, owmWindSpeedDay = temp[i].windSpeed });
+                                table.Add(new WebTable { date = temp[i].periodDate.Date.ToString("dd.MM.yyyy"), owmSymbolDay = temp[i].symbol.Trim('_'), owmTempDay = int.Parse(temp[i].temperature), owmHummidityDay = temp[i].hummidity, owmPressureDay = temp[i].pressure, owmWindSpeedDay = temp[i].windSpeed });
                         }
                         else
                         {
                             if (temp[i].timeOfDay.ToLower() == "ночь")
-                                table.Add(new WebTable { date = temp[i].periodDate, yaSymbolNight = temp[i].symbol, yaTempNight = int.Parse(temp[i].temperature), yaHummidityNight = temp[i].hummidity, yaPressureNight = temp[i].pressure, yaWindSpeedNight = temp[i].windSpeed });
+                                table.Add(new WebTable { date = temp[i].periodDate.Date.ToString("dd.MM.yyyy"), yaSymbolNight = temp[i].symbol, yaTempNight = int.Parse(temp[i].temperature), yaHummidityNight = temp[i].hummidity, yaPressureNight = temp[i].pressure, yaWindSpeedNight = temp[i].windSpeed });
                             if (temp[i].timeOfDay.ToLower() == "день")
-                                table.Add(new WebTable { date = temp[i].periodDate, yaSymbolDay = temp[i].symbol, yaTempDay = int.Parse(temp[i].temperature), yaHummidityDay = temp[i].hummidity, yaPressureDay = temp[i].pressure, yaWindSpeedDay = temp[i].windSpeed });
+                                table.Add(new WebTable { date = temp[i].periodDate.Date.ToString("dd.MM.yyyy"), yaSymbolDay = temp[i].symbol, yaTempDay = int.Parse(temp[i].temperature), yaHummidityDay = temp[i].hummidity, yaPressureDay = temp[i].pressure, yaWindSpeedDay = temp[i].windSpeed });
 
                         }
 
