@@ -75,7 +75,6 @@
 
 </head>
 <body>
-    <div class="alert alert-success" align="center">    <h2>Дневник погоды</h2> </div>
      @*@using (Html.BeginForm())*@
         
             @*@Html.TextBox("date1") <!-- Дата с -->
@@ -90,40 +89,38 @@
             <p>
                 Выберите дату: <input type="date" name="calendar">    
             </p>*@
-    <div class="container border-container">
-        <div class="row">
-            <div class="col-md-4 col-sm-6" align="right">
-                <label for="Regions">Регион</label>
-                <select id="Regions" name="Regions"></select>
-            </div>
-            <div class="col-md-3 col-sm-6" align="right">
-                <label for=" from">
-                    Период с
-                </label>
-                <input type="text" id="from" name="from">
-            </div>
+    <br />
+
+    <div class="alert alert-success">
+    <div class="row">
+        <div class="col-md-4 col-sm-6" align="right">
+            <label for="Regions">Регион</label>
+            <select id="Regions" name="Regions"></select>
         </div>
-        <br />
-        <br />
-        <div class="row">
-            <div class="col-md-4 col-sm-6 " align="right">
-                <label id="cit" for="Cities">Город</label>
-                <select id="Cities" name="Cities"></select>
-            </div>
-            <div class="col-md-3 col-sm-6" align="right">
-                <label for="to">по</label>
-                <input type="text" id="to" name="to">
-            </div>
+        <div class="col-md-3 col-sm-6" align="right">
+            <label for=" from">
+                Период с
+            </label>
+            <input type="text" id="from" name="from">
         </div>
-        <br />
-        <div class="row">
-            <div class="col-md-4 col-sm-6 " align="right">
-                </div>
-            <div class="col-md-3 col-sm-6" align="right">
-                <button type="button" class="btn btn-primary" onclick="Sub()"> Показать</button>
-                </div>
-            </div>
+    </div>
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-md-4 col-sm-6 " align="right">
+            <label id="cit" for="Cities">Город</label>
+            <select id="Cities" name="Cities"></select>
         </div>
+        <div class="col-md-3 col-sm-6" align="right">
+            <label for="to">по</label>
+            <input type="text" id="to" name="to">
+        </div>
+        <div class="col-md-3 col-sm-6" align="left">
+            <button type="button" class="btn btn-primary" onclick="Sub()"> Показать</button>
+        </div>
+    </div>
+
+</div>
     <div class="container">
         <div class="alert alert-danger" id="city_error">
             <strong>Ошибка!</strong> Укажите город! .
@@ -132,9 +129,7 @@
     <script>
         $('#city_error').hide();
     </script>
-    <br />
-    <br />
-
+    
             <!---->
     <p align="center" style="margin:0px;"">
         <table id="jqg"></table>
